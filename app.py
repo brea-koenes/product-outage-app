@@ -6,17 +6,23 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import nltk
+import streamlit as st
 
-nltk.download('punkt')
+# Download required NLTK data
+nltk.download('punkt_tab')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Load model and transformers
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
+# Load model and pre-processing tools
 model = joblib.load("final_model.pkl")
 vectorizer = joblib.load("tfidf_vectorizer.pkl")
 phraser = joblib.load("phraser.pkl")
 
-# Define text preprocessing (match your training pipeline)
+# Text preprocessing function
 stop_words = set(stopwords.words('english'))
 lemmatizer = WordNetLemmatizer()
 
@@ -29,21 +35,25 @@ def preprocess_text(text):
     phrased_tokens = phraser[tokens]
     return " ".join(phrased_tokens)
 
-# Streamlit UI
+# Streamlit app interface
 st.title("Product Outage Classifier")
-st.write("Enter a customer post to classify it as an outage (1) or not (0).")
+st.write("Enter a text post to classify whether it's related to a product outage.")
 
-user_input = st.text_area("Enter post text here:")
+user_input = st.text_area("Text input:")
 
-BEST_THRESHOLD = 0.65  # replace with your best_thresh
+# Replace this with your best threshold found during training
+BEST_THRESHOLD = 0.65
 
 if st.button("Predict"):
     if not user_input.strip():
-        st.warning("Please enter text.")
+        st.warning("Please enter some text.")
     else:
         processed = preprocess_text(user_input)
-        tfidf = vectorizer.transform([processed])
-        proba = model.predict_proba(tfidf)[0][1]
-        label = int(proba >= BEST_THRESHOLD)
-        st.success(f"Prediction: {label} (Probability: {proba:.2f})")
+        transformed = vectorizer.transform([processed])
+        proba = model.predict_proba(transformed)[0][1]
+        prediction = int(proba >= BEST_THRESHOLD)
+
+        label = "Outage (1)" if prediction == 1 else "Not Outage (0)"
+        st.success(f"Prediction: {label}  |  Probability: {proba:.2f}")
+
 
