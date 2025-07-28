@@ -1,8 +1,6 @@
 streamlit
 scikit-learn
-xgboost
-numpy
 nltk
-gensim
+
 
 
