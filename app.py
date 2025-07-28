@@ -10,7 +10,7 @@ from nltk.tokenize import word_tokenize
 
 
 # Download NLTK resources (only once)
-nltk.download('punkt_tab')
+nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
