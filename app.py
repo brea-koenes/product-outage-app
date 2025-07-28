@@ -3,25 +3,32 @@ import joblib
 import re
 import string
 import nltk
-import streamlit as st
+import numpy as np
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
 
-# Download required NLTK data
-nltk.download('punkt_tab')
+
+# Download NLTK resources (only once)
+nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer
 
-# Load model and pre-processing tools
+# Load the saved model and vectorizers
 model = joblib.load("final_model.pkl")
 vectorizer = joblib.load("tfidf_vectorizer.pkl")
 phraser = joblib.load("phraser.pkl")
 
-# Text preprocessing function
-stop_words = set(stopwords.words('english'))
+
+# Set best threshold from training
+BEST_THRESHOLD = 0.65  # use your actual best_thresh if different
+
+
+# Define preprocessing
+stop_words = set(stopwords.words("english"))
 lemmatizer = WordNetLemmatizer()
+
 
 def preprocess_text(text):
     text = str(text).lower()
@@ -29,28 +36,30 @@ def preprocess_text(text):
     text = text.translate(str.maketrans("", "", string.punctuation))
     tokens = word_tokenize(text)
     tokens = [lemmatizer.lemmatize(t) for t in tokens if t not in stop_words]
-    phrased_tokens = phraser[tokens]
-    return " ".join(phrased_tokens)
+    phrased = phraser[tokens]
+    return " ".join(phrased)
 
-# Streamlit app interface
+
+# Streamlit UI
 st.title("Product Outage Classifier")
-st.write("Enter a text post to classify whether it's related to a product outage.")
+st.write("Enter a customer post to check if it's related to a product outage.")
 
-user_input = st.text_area("Text input:")
 
-# Replace this with your best threshold found during training
-BEST_THRESHOLD = 0.65
+user_input = st.text_area("Enter post here:")
 
-if st.button("Predict"):
+
+if st.button("Classify"):
     if not user_input.strip():
         st.warning("Please enter some text.")
     else:
         processed = preprocess_text(user_input)
-        transformed = vectorizer.transform([processed])
-        proba = model.predict_proba(transformed)[0][1]
-        prediction = int(proba >= BEST_THRESHOLD)
+        X = vectorizer.transform([processed])
+        prob = model.predict_proba(X)[0][1]
+        pred = int(prob >= BEST_THRESHOLD)
 
-        label = "Outage (1)" if prediction == 1 else "Not Outage (0)"
-        st.success(f"Prediction: {label}  |  Probability: {proba:.2f}")
+
+        label = "Outage (1)" if pred == 1 else "Not Outage (0)"
+        st.success(f"Prediction: {label} | Probability: {prob:.2f}")
+
 
 
