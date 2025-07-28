@@ -1,8 +1,8 @@
-streamlit==1.39.0
-scikit-learn==1.5.2
-xgboost==2.1.1
-numpy==1.26.4
-nltk==3.9.1
-gensim==4.3.3
+streamlit
+scikit-learn
+xgboost
+numpy
+nltk
+gensim
 
 
