@@ -1,28 +1,29 @@
 import streamlit as st
+import joblib
+import numpy as np
 
-# Predict button
-if st.button("Classify"):
-    if user_input.strip() == "":
-        st.warning("Please enter some text to classify.")
-    else:
-        # Preprocess the input text
-        tokens = preprocess_text_for_phrasing(user_input)
-        # Apply phraser
-        phrased_tokens = phraser[tokens]
-        # Rejoin tokens for TF-IDF
-        text_tfidf = ' '.join(phrased_tokens)
-        # Transform using TF-IDF vectorizer
-        text_transformed = tfidf_vectorizer.transform([text_tfidf]).toarray()
-        
-        # Predict probability
-        proba = xgb_clf.predict_proba(text_transformed)[:, 1]
-        
-        # Apply best threshold
-        prediction = (proba >= best_thresh).astype(int)[0]
-        
-        # Display results
-        st.write(f"**Prediction**: {'Positive (1)' if prediction == 1 else 'Negative (0)'}")
-        st.write(f"**Probability of Positive Class**: {proba[0]:.4f}")
 
+# Load model
+model = joblib.load("final_model.pkl")
+
+
+st.title("Product Outage Classifier")
+
+
+st.write("Enter product features to predict an outage.")
+
+
+# Example inputs – update these based on your model's features
+feature_1 = st.number_input("Feature 1")
+feature_2 = st.number_input("Feature 2")
+feature_3 = st.number_input("Feature 3")
+
+
+if st.button("Predict"):
+    input_data = np.array([[feature_1, feature_2, feature_3]])
+    prediction = model.predict(input_data)
+
+
+    st.success(f"Prediction: {prediction[0]}")
 
 
