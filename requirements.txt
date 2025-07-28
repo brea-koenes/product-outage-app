@@ -2,4 +2,6 @@ streamlit
 scikit-learn
 xgboost
 joblib
-numpy
+nltk
+gensim
+
