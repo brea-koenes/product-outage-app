@@ -2,9 +2,6 @@ import streamlit as st
 import joblib
 import re
 import string
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer
 import nltk
 import streamlit as st
 
